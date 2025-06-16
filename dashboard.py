@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+from pathlib import Path
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
@@ -19,7 +20,8 @@ from data_processing import calc_cv, BusinessAnalyzer, process_data
 st.set_page_config(page_title="経営ダッシュボード", layout="wide", initial_sidebar_state="expanded")
 
 # 最適化されたCSS
-st.markdown(open("assets/style.css").read(), unsafe_allow_html=True)
+css_path = Path(__file__).parent / "assets" / "style.css"
+st.markdown(f"<style>{css_path.read_text()}</style>", unsafe_allow_html=True)
 
 if 'dark_mode' in st.session_state:
     if st.session_state['dark_mode']:
