@@ -4,3 +4,4 @@ plotly
 numpy
 scipy
 scikit-learn
+flask

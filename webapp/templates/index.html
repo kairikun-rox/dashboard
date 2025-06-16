@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Web App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body class="bg-gray-100 p-6">
+    <h1 class="text-2xl font-bold mb-4">Dashboard Web App</h1>
+    <form method="post" enctype="multipart/form-data" class="space-y-4 mb-6">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">売上Excel</label>
+            <input type="file" name="sales" class="mt-1 block w-full border border-gray-300 rounded-md">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-gray-700">原料Excel</label>
+            <input type="file" name="material" class="mt-1 block w-full border border-gray-300 rounded-md">
+        </div>
+        <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded">アップロード</button>
+    </form>
+
+    {% if metrics %}
+    <div class="grid grid-cols-2 gap-4">
+        <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold">総売上額</h2>
+            <p class="mt-2">{{ "{:,.0f}".format(metrics['total_sales']) }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold">総原料費</h2>
+            <p class="mt-2">{{ "{:,.0f}".format(metrics['total_material']) }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold">総利益</h2>
+            <p class="mt-2">{{ "{:,.0f}".format(metrics['total_profit']) }}</p>
+        </div>
+        <div class="bg-white p-4 shadow rounded">
+            <h2 class="text-lg font-semibold">利益率</h2>
+            <p class="mt-2">{{ "{:.2f}%".format(metrics['overall_profit_rate']) }}</p>
+        </div>
+    </div>
+    <div id="graph" class="mt-8"></div>
+    <script>
+    var graphData = JSON.parse(`{{ graphJSON | safe }}`);
+    Plotly.newPlot('graph', graphData.data, graphData.layout);
+    </script>
+    {% endif %}
+</body>
+</html>
