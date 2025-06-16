@@ -54,47 +54,27 @@ def standardize_data(data):
 st.set_page_config(page_title="経営ダッシュボード", layout="wide", initial_sidebar_state="expanded")
 
 # 最適化されたCSS
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    body {font-family: 'Inter', sans-serif; background-color: #f5f7fa;}
-    @keyframes fadeInDown {0% {opacity: 0; transform: translateY(-20px);} 100% {opacity: 1; transform: translateY(0);}}
-    @keyframes fadeInUp {0% {opacity: 0; transform: translateY(10px);} 100% {opacity: 1; transform: translateY(0);}}
-    .nav-bar {background: linear-gradient(90deg, #1e3a8a, #2563eb); color: #fff; padding: 0.75rem 1.5rem;
-              border-radius: 0 0 12px 12px; font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;
-              animation: fadeInDown 0.6s ease-out;}
-    .main-title { text-align: center; color: #1f2937; font-size: 2.5rem; font-weight: 700;
-                 background: linear-gradient(90deg, #3b82f6, #8b5cf6); -webkit-background-clip: text;
-                 margin-bottom: 2rem; animation: fadeInDown 0.8s ease-out; }
-    div[data-testid="metric-container"] { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-                                         border: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px;
-                                         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
-    div[data-testid="metric-container"]:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-    .section-header { color: #1e293b; font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 1rem 0;
-                     padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; transition: color 0.3s;
-                     animation: fadeInUp 0.6s ease-out; }
-    .kpi-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;
-               padding: 1.5rem; border-radius: 12px; margin: 0.5rem 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .alert-card { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white;
-                 padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
-    .success-card { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;
-                   padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
-    .info-card { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white;
-                padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
-    [data-testid="stSidebar"] > div:first-child {background:#1f2937; color:#f8fafc;}
-</style>
-""", unsafe_allow_html=True)
+st.markdown(open("assets/style.css").read(), unsafe_allow_html=True)
 
-if 'dark_mode' in st.session_state and st.session_state['dark_mode']:
-    st.markdown(
-        """
-        <style>
-            body { background-color: #111827; color: #f9fafb; }
-            .section-header { color: #f9fafb; border-bottom-color: #374151; }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+if 'dark_mode' in st.session_state:
+    if st.session_state['dark_mode']:
+        st.markdown(
+            """
+            <script>
+            document.body.classList.add('dark-mode');
+            </script>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            """
+            <script>
+            document.body.classList.remove('dark-mode');
+            </script>
+            """,
+            unsafe_allow_html=True,
+        )
 
 st.markdown('<div class="nav-bar">🏢 経営統合管理</div>', unsafe_allow_html=True)
 st.markdown('<h1 class="main-title">📊 経営統合ダッシュボード</h1>', unsafe_allow_html=True)
