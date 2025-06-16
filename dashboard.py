@@ -54,29 +54,60 @@ def standardize_data(data):
 st.set_page_config(page_title="経営ダッシュボード", layout="wide", initial_sidebar_state="expanded")
 
 # 最適化されたCSS
-st.markdown("""
+theme_choice = st.session_state.get("theme_color", "ブルー")
+color_map = {
+    "ブルー": ("#3b82f6", "#8b5cf6"),
+    "グリーン": ("#10b981", "#34d399"),
+    "オレンジ": ("#f97316", "#f59e0b"),
+    "レッド": ("#ef4444", "#f87171"),
+}
+accent_start, accent_end = color_map.get(theme_choice, ("#3b82f6", "#8b5cf6"))
+
+st.markdown(f"""
 <style>
-    .main-title { text-align: center; color: #1f2937; font-size: 2.5rem; font-weight: 700; 
-                 background: linear-gradient(90deg, #3b82f6, #8b5cf6); -webkit-background-clip: text; 
-                 margin-bottom: 2rem; }
-    div[data-testid="metric-container"] { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
-                                         border: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px; 
-                                         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }
-    div[data-testid="metric-container"]:hover { transform: translateY(-2px); }
-    .section-header { color: #1e293b; font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 1rem 0; 
-                     padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; }
-    .kpi-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; 
-               padding: 1.5rem; border-radius: 12px; margin: 0.5rem 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .alert-card { background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white; 
-                 padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
-    .success-card { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; 
-                   padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
-    .info-card { background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; 
-                padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }
+    @keyframes fadeInDown {{
+        0% {{opacity: 0; transform: translateY(-20px);}}
+        100% {{opacity: 1; transform: translateY(0);}}
+    }}
+    .main-title {{ text-align: center; color: #1f2937; font-size: 2.5rem; font-weight: 700;
+                 background: linear-gradient(90deg, {accent_start}, {accent_end}); -webkit-background-clip: text;
+                 margin-bottom: 2rem; animation: fadeInDown 0.8s ease-out; }}
+    div[data-testid="metric-container"] {{ background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+                                         border: 1px solid #e2e8f0; padding: 1rem; border-radius: 12px;
+                                         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; }}
+    div[data-testid="metric-container"]:hover {{ transform: translateY(-2px); }}
+    .section-header {{ color: #1e293b; font-size: 1.5rem; font-weight: 600; margin: 1.5rem 0 1rem 0;
+                     padding-bottom: 0.5rem; border-bottom: 2px solid #e2e8f0; transition: color 0.3s; }}
+    .kpi-card {{ background: linear-gradient(135deg, {accent_start} 0%, {accent_end} 100%); color: white;
+               padding: 1.5rem; border-radius: 12px; margin: 0.5rem 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }}
+    .alert-card {{ background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); color: white;
+                 padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }}
+    .success-card {{ background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white;
+                   padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }}
+    .info-card {{ background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white;
+                padding: 1rem; border-radius: 8px; margin: 0.5rem 0; }}
+    div[data-testid="stProgress"] > div > div > div {{ background-color: {accent_start}; }}
 </style>
 """, unsafe_allow_html=True)
 
+if 'dark_mode' in st.session_state and st.session_state['dark_mode']:
+    st.markdown(
+        """
+        <style>
+            body { background-color: #111827; color: #f9fafb; }
+            .section-header { color: #f9fafb; border-bottom-color: #374151; }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
 st.markdown('<h1 class="main-title">📊 経営統合ダッシュボード</h1>', unsafe_allow_html=True)
+
+if 'loaded_once' not in st.session_state:
+    with st.spinner("Loading Dashboard..."):
+        time.sleep(1)
+    st.balloons()
+    st.session_state['loaded_once'] = True
 
 # ============================================================================
 # 共通関数・ユーティリティ（最適化済み）
@@ -334,6 +365,16 @@ class BusinessAnalyzer:
 # ============================================================================
 
 with st.sidebar:
+    dark_mode = st.checkbox("🌙 ダークモード", key="dark_mode")
+    theme_color = st.selectbox(
+        "🎨 アクセントカラー",
+        ["ブルー", "グリーン", "オレンジ", "レッド"],
+        key="theme_color"
+    )
+    st.markdown("### 🎯 月間目標設定")
+    sales_goal = st.number_input("売上目標 (¥)", value=1000000, step=100000, key="sales_goal")
+    profit_goal = st.number_input("利益目標 (¥)", value=200000, step=50000, key="profit_goal")
+
     st.markdown("### 📁 ファイルアップロード")
     sales_xlsx = st.file_uploader("売上 Excel ファイル", type=["xlsx"], key="sales")
     material_xlsx = st.file_uploader("原料 Excel ファイル", type=["xlsx"], key="material")
@@ -518,6 +559,14 @@ with tabs[0]:
         with col5:
             alert_count = anomalies['anomaly_count']
             st.metric("⚠️ アラート", f"{alert_count}件", delta=f"-{alert_count}件" if alert_count > 0 else "正常")
+
+        st.markdown('<h3 class="section-header">🎯 目標達成状況</h3>', unsafe_allow_html=True)
+        sales_progress = metrics['total_sales'] / sales_goal if sales_goal else 0
+        profit_progress = metrics['total_profit'] / profit_goal if profit_goal else 0
+        st.progress(min(sales_progress, 1.0))
+        st.caption(f"売上達成率 {sales_progress*100:.1f}%")
+        st.progress(min(profit_progress, 1.0))
+        st.caption(f"利益達成率 {profit_progress*100:.1f}%")
         
         # 中部：パフォーマンス概要
         col1, col2 = st.columns(2)
